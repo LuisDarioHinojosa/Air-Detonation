@@ -1,0 +1,317 @@
+package libreria;
+import java.util.ArrayList;
+
+import libreria.ManejadorArregloGen;
+//guardar detonadores en un arreglo
+public class RT {
+private String nombre;
+private String lugar;
+private Traceur [] ins;
+private final int totalT=600;
+private int numT;
+private int[] tallas;
+private int [][] competencia;
+private detonadores[] det;
+private int total[];
+private int numDet;
+private final int criterios=4;
+private final int totaldet=18;
+
+
+
+public RT() {
+	numT=0;
+	ins=new Traceur [totalT];
+	for (int i=0;i<totalT;i++) {
+		ins[i]=null;}
+	tallas=new int[4];//CHICA MEDIANA GRANDE EXTRAGRANDE
+	
+	competencia=new int [criterios][totaldet];
+	for (int i=0;i<criterios;i++)
+		for (int j=0;j<totaldet;j++)
+			competencia[i][j]=0;
+	
+	det=new detonadores[totaldet];
+			numDet=0;
+			
+			total=new int [totaldet];
+}
+
+
+public RT(String nombre, String lugar) {
+	this();
+	this.nombre = nombre;
+	this.lugar = lugar;
+
+}
+
+public String realizarRegistro (String nombre, int edad, String equipo, double pago, boolean playera, boolean detonador, char talla) {
+	String res="no se realizo el registro";
+	int pos;
+	Traceur a=null;
+	if (numT<totalT)
+		a=new Traceur ( nombre,  edad,  equipo,  pago,  playera,  detonador, talla);
+	pos=ManejadorArregloGen.busqSecuencialDesordenada(ins, numT, a);//cambiar ordenada
+	if (pos<0) {
+		pos=-pos-1;
+		ManejadorArregloGen.corrimientosDer(ins, numT, pos);
+		ins[pos]=a;
+		numT++;
+		res="registro exitoso. Clave:" +ins[pos].getClave();
+	}
+	
+	
+	
+	return res;
+		
+	
+}
+
+
+
+
+
+public String imprimirListas () {//imprime las listas de inscripcion con toda la informacion
+	StringBuilder cad=new StringBuilder();
+	for (int i=0;i<numT;i++) {
+		cad.append("\n"+ ins[i].toString());
+	cad.append("\n");}
+	return cad.toString();
+}
+
+public String bajaDelRegistro (int clave) {
+	String res="no se encontro el usuario";
+	int pos=0;
+	Traceur t= new Traceur (clave);
+	pos=ManejadorArregloGen.busqSecuencialDesordenada(ins, numT, t);
+	if (pos>0) {
+		ManejadorArregloGen.corrimientosIzq(ins, numT, pos);
+		numT--;
+		ins[numT]=null;
+		res="baja del registro correcta.";
+	}
+			return res;
+}
+
+public String encuentraPersona (int clave) {//REGRESA LA PERSONA DADA SU CLAVE DEL EVENTO
+	String res="no se encontro el usuario";
+	
+		Traceur a= new Traceur (clave);
+	int pos=0;
+	pos=ManejadorArregloGen.busqSecuencialDesordenada(ins, numT, a);
+	if (pos>0) {
+		res=ins[pos].toString();
+	}
+	return res;
+}
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+public String tallasPlayera () {//Regresa el numero total de playeras
+	for (int i=0;i<numT;i++) {
+		char talla=ins[i].getTalla();
+		switch (talla) {
+		case 'c':
+			tallas[0]++;
+			break;
+		case 'm':
+			tallas[1]++;
+			break;
+		case 'l':
+			tallas[2]++;
+			break;
+		case 'e':
+			tallas[3]++;
+			break;
+		}	
+}
+	StringBuilder cad=new StringBuilder();
+	cad.append("Chica:" +tallas[0]);
+	cad.append("\n");
+	cad.append("Medianas:" +tallas[1]);
+	cad.append("\n");
+	cad.append("Grandes:" +tallas[2]);
+	cad.append("\n");
+	cad.append("ExtraGrandes:" +tallas[3]);
+	cad.append("\n");
+	return cad.toString();
+}
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+
+ 
+public void imprimirmatriz () {///imprime la matriz de competencia//YA ESTAN
+	ManejadorMatrizes.imprimeMatriz(competencia, criterios, totaldet);
+
+			
+	
+}
+
+public String iniciarMatriz () {//llena la matriz en cerosYA ESTAN
+	String res="no se lleno";
+	for(int i=0;i<numDet;i++) {
+		competencia [0][i]= 0;
+		competencia [1][i]= 0;
+		competencia [2][i]= 0;
+		competencia [3][i]= 0;
+		}
+		if(competencia[1][1]==0)
+			res="inicio corectamente ";
+	return res;
+}
+
+
+
+public String llenarDet () {//inicializa el arreglo paralelo de detonadoresYAESTA
+	String res="no se lleno el arreglo";
+	for (int i=0;i<numT;i++) {
+	int pos=0; 
+		if(ins[i].isDetonador()==true) {
+			String nombre=ins[i].getNombre();
+			int clave=ins[i].getClave();
+			int flow=0;
+			int dificultad=0;//int clave, int puntosFlow, int puntosEjecucion, int puntosDificultad,
+			int creatividad=0;
+			int eje=0;
+			detonadores a=new detonadores (nombre, clave, flow, eje, creatividad,dificultad );
+			if(numDet<totaldet)
+				det[numDet]=a;
+			numDet++;
+			res="se lleno el arreglo";
+		}}
+	return res;
+}
+public String imprimenoombresDet() {//imprime los nombres de los competidores
+	String res="";
+	for (int i=0;i<numDet;i++)
+		res=res+det[i].getNombre()+det[i].getClave()+"";
+	return res;
+}
+
+public String imprimenoombresDet2() {//imprime los nombres de los competidores
+	String res="";
+	for (int i=0;i<numDet;i++)
+		res=res+det[i].getNombre()+"";
+	return res;
+}
+
+public String llenarMatrizCompetencia () {//llena la matriz y la actualiza con los nuevos valores de cada categoria
+	String res="no se lleno";
+	for(int i=0;i<numDet;i++) {
+		competencia [0][i]= competencia [0][i]+det[i].getPuntosFlow();
+		competencia [1][i]= competencia [1][i]+det[i].getPuntosEjecucion();
+		competencia [2][i]= competencia [2][i]+det[i].getPuntosCreatividad();
+		competencia [3][i]= competencia [3][i]+det[i].getPuntosDificultad();
+		if(competencia[0][i]!=0)
+			res="SE actualizo la matrizz correctamtne ";	
+	}
+		
+	return res;
+}
+public void evaluarCompetidor (int clave, int flow, int eje, int creatividad, int dificultad) {//sirve para poner los nuevos datos de cada categoria de un competidos dada su clave
+	int pos=0;
+	for (int i=0; i<numDet;i++) {
+		if(det[i].getClave()==clave) {
+		det[i].setPuntosFlow(flow);
+		det[i].setPuntosEjecucion(eje);
+		det[i].setPuntosCreatividad(creatividad);
+		det[i].setPuntosDificultad(dificultad);
+		}
+}}
+public String totalFases() {//arreglo de la suma de cada columa
+	String res="";
+	for (int i=0;i<numDet;i++) {
+		total[i]=ManejadorMatrizes.sumaColumna(competencia, criterios, i);
+		res=res+total[i]+"";
+	}
+	return res;
+	
+}
+public String orden() {//ordena el arreglo total de mayor a menor
+	String res="";
+	ManejadorArregloGen.ordenaArreglo(total, numDet);
+	for (int i=0;i<numDet;i++) {
+		res=res + total[i] +"";}
+	return res;
+}
+
+public void guardaTotales () {
+	for (int i=0;i<numDet;i++) {
+		int tot=total[i];
+		String nombre=det[i].getNombre();
+		int clave=det[i].getClave();
+		detonadores a=new detonadores(tot, clave, nombre);
+		det[i]=a;
+		System.out.println(det[i].toString());
+		
+}}
+public void ordenaArregloDet(){
+	for (int i=0;i<numDet;i++) {
+		detonadores a=null;
+		for (int j=0;j<numDet;j++) {
+			if(total[i]==det[j].getTotal()) {
+				a=det[i];
+				det[i]=det[j];
+				det[j]=det[i];	
+			}
+				
+		}
+	}
+}
+
+public String ordenarArreglosinrepeptir() {
+	String res="Por reglamento no puede haber empates";
+	for (int i=0;i<numDet;i++) {
+		for (int j=0;j<numDet;j++)
+			if (total[i]!=total [j]) {
+				res="Se han acomodado los competidores por sus puntos";
+				ordenaArregloDet();
+			}
+				
+	}
+	return res;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+public void descalificar () {
+	for (int i=13;i<totaldet;i++) {
+		detonadores a=new detonadores(0,0,"");
+		det[i]=a;
+		numDet-=5;
+	}
+}
+
+
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+public int numMenores () {
+	int num=0;
+	for (int i=0; i<numT;i++)
+		if (ins[i].getEdad()<18)
+			num++;
+	return num;
+}
+
+public ArrayList <String> menores () {
+ArrayList l= new ArrayList <String> ();
+for (int i=0;i<numT;i++)
+	if (ins[i].getEdad()<18)
+		l.add("nombre" + ins[i].getNombre() + "clave" + ins[i].getClave());
+return l;
+}
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////7
+
+
+
+}
